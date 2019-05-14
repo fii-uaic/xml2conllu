@@ -122,9 +122,9 @@ def convert2conllu(xml_content, postag_data=None):
 
             if deprel == 'punct':
                 # Special case.
-                # Add SpaceAfter=no to previous element.
+                # Add SpaceAfter=No to previous element.
                 if word_conllu_lines:
-                    word_conllu_lines[-1] += '|SpaceAfter=no'
+                    word_conllu_lines[-1] += '|SpaceAfter=No'
 
             # This is the first word
             if sentence == "":
