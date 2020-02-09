@@ -82,15 +82,7 @@ def convert2conllu(xml_content, postag_data=None):
     sentence_id = 1
     validation_errors = []
     for xml_sentence in xml_root.findall('sentence'):
-        try:
-            citation_part = xml_sentence.attrib['citation-part']
-        except KeyError:
-            line_no = xml_sentence.sourceline - 1
-            raise ConvertError("ParseError",
-                               "expected citation-part",
-                               line_no,
-                               len(xml_lines[line_no]),
-                               xml_lines[line_no])
+        citation_part = xml_sentence.attrib.get('citation-part')
 
         word_conllu_lines = []
         sentence = ""
@@ -110,7 +102,7 @@ def convert2conllu(xml_content, postag_data=None):
                 continue
 
             word = word_dict['form']
-            misc = 'ref=' + citation_part.replace(' ', '')
+            misc = 'ref=' + citation_part.replace(' ', '') if citation_part else ""
 
             postag = word_dict['postag']
             upostag, xpostag, features = postag_data[postag]
@@ -152,7 +144,8 @@ def convert2conllu(xml_content, postag_data=None):
         # Print the sentence
         conllu_output += '# sent_id = test-%s\n' % sentence_id
         conllu_output += '# text = %s\n' % sentence
-        conllu_output += '# citation-part=%s\n' % citation_part
+        if citation_part:
+            conllu_output += '# citation-part=%s\n' % citation_part
         conllu_output += "\n".join(word_conllu_lines)
         conllu_output += '\n\n'
 
