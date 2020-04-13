@@ -112,6 +112,8 @@ def convert2conllu(xml_content, postag_data=None):
             else:
                 if (deprel != 'punct') and (sentence[-1] != '-'):
                     sentence += ' '
+                if (sentence[-1] == ' ') and (word[0] == '-'):
+                    sentence = sentence.rstrip()
                 sentence += word
 
             word_conllu_line = "\t".join([
