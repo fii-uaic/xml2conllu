@@ -103,6 +103,8 @@ def convert2conllu(xml_content, postag_data=None):
                     word_conllu_lines[-1] += '|SpaceAfter=No'
             if word[0] == '-':
                 word_conllu_lines[-1] += '|SpaceAfter=No'
+            if word[-1] == '-':
+                misc += '|SpaceAfter=No'
 
             # This is the first word
             if sentence == "":
