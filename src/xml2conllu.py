@@ -110,7 +110,7 @@ def convert2conllu(xml_content, postag_data=None):
             if sentence == "":
                 sentence = word
             else:
-                if deprel != 'punct':
+                if (deprel != 'punct') and (sentence[-1] != '-'):
                     sentence += ' '
                 sentence += word
 
