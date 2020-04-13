@@ -1,17 +1,13 @@
 import lxml.etree as ET
 import io
 import itertools as IT
-from tkinter import filedialog, Tk, Frame, Button, Entry, Label, END, Toplevel, Text
+from tkinter import filedialog, Tk, Frame, Button, Entry, Label, END
+from tkinter import Toplevel
+from tkinter import Text
 
 _UNSPECIFIED_CHAR = '_'
 
-_REQUIRED_ATTRIBUTES = [
-    'id',
-    'form',
-    'postag',
-    'head',
-    'deprel'
-]
+_REQUIRED_ATTRIBUTES = ['id', 'form', 'postag', 'head', 'deprel']
 
 
 def get_validation_errors(line, xml_word, postag_data):
@@ -20,8 +16,8 @@ def get_validation_errors(line, xml_word, postag_data):
     line_no, column_no = xml_word.sourceline - 1, None
     msg = ""
 
-    missing_attrs = list(filter(lambda x: x not in word_dict,
-                                _REQUIRED_ATTRIBUTES))
+    missing_attrs = list(
+        filter(lambda x: x not in word_dict, _REQUIRED_ATTRIBUTES))
 
     if missing_attrs:
         msg = "missing '%s' attribute/attributes" % ",".join(missing_attrs)
@@ -32,8 +28,7 @@ def get_validation_errors(line, xml_word, postag_data):
             msg = "invalid postag '%s'" % postag
 
     if msg != "":
-        return [ConvertError("ConvertError", msg,
-                             line_no, column_no, line)]
+        return [ConvertError("ConvertError", msg, line_no, column_no, line)]
 
 
 def build_pretty_error_msg(error, column_no, line):
@@ -42,22 +37,13 @@ def build_pretty_error_msg(error, column_no, line):
 
 
 class ConvertError(Exception):
-    def __init__(self,
-                 err_name,
-                 err_type,
-                 line_no,
-                 column_no,
-                 line):
+    def __init__(self, err_name, err_type, line_no, column_no, line):
         column_msg = ""
         if column_no is not None:
             column_msg = ", column %s" % column_no
 
-        error_msg = "%s: %s: line %s%s" % (
-            err_name,
-            err_type,
-            line_no,
-            column_msg
-        )
+        error_msg = "%s: %s: line %s%s" % (err_name, err_type, line_no,
+                                           column_msg)
         self.msg = build_pretty_error_msg(error_msg, column_no, line)
 
     def __str__(self):
@@ -91,18 +77,16 @@ def convert2conllu(xml_content, postag_data=None):
             word_dict = xml_word.attrib
             line_no = xml_word.sourceline - 1
 
-            convert_errors = get_validation_errors(
-                xml_lines[line_no],
-                xml_word,
-                postag_data
-            )
+            convert_errors = get_validation_errors(xml_lines[line_no],
+                                                   xml_word, postag_data)
 
             if convert_errors:
                 validation_errors.extend(convert_errors)
                 continue
 
             word = word_dict['form']
-            misc = 'ref=' + citation_part.replace(' ', '') if citation_part else ""
+            ref = citation_part.replace(' ', '') if citation_part else ""
+            misc = 'ref=' + ref
 
             postag = word_dict['postag']
             upostag, xpostag, features = postag_data[postag]
@@ -127,16 +111,11 @@ def convert2conllu(xml_content, postag_data=None):
                 sentence += word
 
             word_conllu_line = "\t".join([
-                word_dict['id'],
-                word,
-                word_dict.get('lemma', _UNSPECIFIED_CHAR),
-                upostag,
-                xpostag,
+                word_dict['id'], word,
+                word_dict.get('lemma', _UNSPECIFIED_CHAR), upostag, xpostag,
                 features,
-                word_dict.get('head', _UNSPECIFIED_CHAR),
-                deprel,
-                word_dict.get('deps', _UNSPECIFIED_CHAR),
-                misc
+                word_dict.get('head', _UNSPECIFIED_CHAR), deprel,
+                word_dict.get('deps', _UNSPECIFIED_CHAR), misc
             ])
 
             word_conllu_lines.append(word_conllu_line)
@@ -155,8 +134,7 @@ def convert2conllu(xml_content, postag_data=None):
 
 def split_with_positions(string):
     results = []
-    for k, g in IT.groupby(enumerate(string),
-                           lambda x: not x[1].isspace()):
+    for k, g in IT.groupby(enumerate(string), lambda x: not x[1].isspace()):
         if k:
             pos, first_item = next(g)
             results.append((pos, first_item + ''.join([x for _, x in g])))
@@ -170,15 +148,12 @@ def convert(xml_file, conllu_file, postag_file):
         for idx, line in enumerate(data_lines):
             splits = split_with_positions(line)
             if len(splits) == 5:
-                postag, _, upostag, xpostag, features = map(lambda x: x[1],
-                                                            splits)
+                postag, _, upostag, xpostag, features = map(
+                    lambda x: x[1], splits)
                 postag_data[postag] = (upostag, xpostag, features)
             else:
-                raise ConvertError("PostagFileError",
-                                   "too many values",
-                                   idx,
-                                   splits[5][0],
-                                   line)
+                raise ConvertError("PostagFileError", "too many values", idx,
+                                   splits[5][0], line)
 
     with open(xml_file, 'r', encoding='utf-8') as fxml:
         xml_content = fxml.read()
@@ -194,22 +169,20 @@ def convert(xml_file, conllu_file, postag_file):
 
 class Application(Frame):
     def ask_open_postag_file(self):
-        filename = filedialog.askopenfilename(
-            initialdir="./",
-            title="Select file",
-            filetypes=(("txt files", "*.txt"),
-                       ("all files", "*.*"))
-        )
+        filename = filedialog.askopenfilename(initialdir="./",
+                                              title="Select file",
+                                              filetypes=(("txt files",
+                                                          "*.txt"),
+                                                         ("all files", "*.*")))
         self.postag_input.delete(0, END)
         self.postag_input.insert(0, filename)
 
     def ask_open_xml_file(self):
-        filename = filedialog.askopenfilename(
-            initialdir="./",
-            title="Select file",
-            filetypes=(("xml files", "*.xml"),
-                       ("all files", "*.*"))
-        )
+        filename = filedialog.askopenfilename(initialdir="./",
+                                              title="Select file",
+                                              filetypes=(("xml files",
+                                                          "*.xml"),
+                                                         ("all files", "*.*")))
         self.xml_input.delete(0, END)
         self.xml_input.insert(0, filename)
 
@@ -217,9 +190,7 @@ class Application(Frame):
         filename = filedialog.asksaveasfilename(
             initialdir="./",
             title="Select file",
-            filetypes=(("conllu files", "*.conllu"),
-                       ("all files", "*.*"))
-        )
+            filetypes=(("conllu files", "*.conllu"), ("all files", "*.*")))
         self.conllu_output.delete(0, END)
         self.conllu_output.insert(0, filename)
 
@@ -268,17 +239,11 @@ class Application(Frame):
 
         full_text = "Success!"
         try:
-            errors = convert(
-                xml_filename,
-                conllu_filename,
-                postag_filename
-            )
+            errors = convert(xml_filename, conllu_filename, postag_filename)
             if errors:
                 full_text = "\n".join(map(lambda x: x.msg, errors))
         except Exception as err:
-            full_text = "\n".join([
-                "Fatal error!", str(err)
-            ])
+            full_text = "\n".join(["Fatal error!", str(err)])
 
         status_window = Toplevel(self)
         status_window.wm_title("Convert output!")
