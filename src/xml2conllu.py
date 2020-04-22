@@ -100,7 +100,7 @@ def convert2conllu(xml_content, postag_data=None):
                 # Add SpaceAfter=No to previous element.
                 if word_conllu_lines:
                     word_conllu_lines[-1] += '|SpaceAfter=No'
-            if word[0] == '-':
+            if word[0] == '-' and len(word_conllu_lines) > 0:
                 word_conllu_lines[-1] += '|SpaceAfter=No'
             if word[-1] == '-':
                 misc += '|SpaceAfter=No'
