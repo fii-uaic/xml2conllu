@@ -2,6 +2,8 @@ import lxml.etree as ET
 import io
 import itertools as IT
 
+from argparse import ArgumentParser
+
 _UNSPECIFIED_CHAR = '_'
 
 _REQUIRED_ATTRIBUTES = ['id', 'form', 'postag', 'head', 'deprel']
@@ -170,6 +172,33 @@ def convert(xml_file, conllu_file, postag_file):
     return errors
 
 
+def parse_arguments():
+    parser = ArgumentParser()
+    parser.add_argument(
+        '--no-window',
+        help='Run in command line mode, i.e. without displaying GUI.',
+        action='store_true')
+    parser.add_argument('--xml-file',
+                        help="Path of the input XML file.",
+                        required=False)
+    parser.add_argument('--conllu-file',
+                        help="Path of the output CoNLL-U file.",
+                        required=False)
+    parser.add_argument('--postag-file',
+                        help="Path of the input POSTag file.",
+                        required=False)
+
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
+    args = parse_arguments()
+    if args.no_window:
+        convert(args.xml_file, args.conllu_file, args.postag_file)
+    else:
+        from application import Application
+        from tkinter import Tk
+        root = Tk()
+        app = Application(convert, master=root)
+        app.mainloop()
+        root.destroy()
