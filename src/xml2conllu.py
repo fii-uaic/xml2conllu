@@ -1,9 +1,6 @@
 import lxml.etree as ET
 import io
 import itertools as IT
-from tkinter import filedialog, Tk, Frame, Button, Entry, Label, END
-from tkinter import Toplevel
-from tkinter import Text
 
 _UNSPECIFIED_CHAR = '_'
 
@@ -173,99 +170,6 @@ def convert(xml_file, conllu_file, postag_file):
     return errors
 
 
-class Application(Frame):
-    def ask_open_postag_file(self):
-        filename = filedialog.askopenfilename(initialdir="./",
-                                              title="Select file",
-                                              filetypes=(("txt files",
-                                                          "*.txt"),
-                                                         ("all files", "*.*")))
-        self.postag_input.delete(0, END)
-        self.postag_input.insert(0, filename)
-
-    def ask_open_xml_file(self):
-        filename = filedialog.askopenfilename(initialdir="./",
-                                              title="Select file",
-                                              filetypes=(("xml files",
-                                                          "*.xml"),
-                                                         ("all files", "*.*")))
-        self.xml_input.delete(0, END)
-        self.xml_input.insert(0, filename)
-
-    def ask_save_conllu_file(self):
-        filename = filedialog.asksaveasfilename(
-            initialdir="./",
-            title="Select file",
-            filetypes=(("conllu files", "*.conllu"), ("all files", "*.*")))
-        self.conllu_output.delete(0, END)
-        self.conllu_output.insert(0, filename)
-
-    def __init__(self, master=None):
-        Frame.__init__(self, master)
-
-        # ## XML Input ## #
-        Label(master, text="Xml file").grid(row=0)
-        self.xml_input = Entry(master)
-        self.xml_input.grid(row=0, column=1)
-        Button(master,
-               text='Browse',
-               command=self.ask_open_xml_file) \
-            .grid(row=0, column=2)
-        # ## END ## #
-
-        # ## Postag Input ## #
-        Label(master, text="Postag file").grid(row=1)
-        self.postag_input = Entry(master)
-        self.postag_input.grid(row=1, column=1)
-        Button(master,
-               text='Browse',
-               command=self.ask_open_postag_file) \
-            .grid(row=1, column=2)
-        # ## END ## #
-
-        # ## Conllu output ## #
-        Label(master, text="Output conllu file").grid(row=2)
-        self.conllu_output = Entry(master)
-        self.conllu_output.grid(row=2, column=1)
-        Button(master,
-               text='Browse',
-               command=self.ask_save_conllu_file) \
-            .grid(row=2, column=2)
-        # ## END ## #
-
-        self.convert_button = Button(master,
-                                     text='Convert!',
-                                     command=self.convert)
-        self.convert_button.grid(row=3, column=1)
-
-    def convert(self):
-        xml_filename = self.xml_input.get()
-        postag_filename = self.postag_input.get()
-        conllu_filename = self.conllu_output.get()
-
-        full_text = "Success!"
-        try:
-            errors = convert(xml_filename, conllu_filename, postag_filename)
-            if errors:
-                full_text = "\n".join(map(lambda x: x.msg, errors))
-        except Exception as err:
-            full_text = "\n".join(["Fatal error!", str(err)])
-
-        status_window = Toplevel(self)
-        status_window.wm_title("Convert output!")
-
-        text = Text(status_window, width=100, height=20)
-        text.insert(END, full_text)
-        text.pack()
-
-        quit = Button(status_window,
-                      text="Close",
-                      command=status_window.destroy)
-        quit.pack()
 
 
 if __name__ == '__main__':
-    root = Tk()
-    app = Application(master=root)
-    app.mainloop()
-    root.destroy()
