@@ -89,11 +89,10 @@ class Application(Frame):
             return
         full_text = "Success!"
         try:
-            errors = self.convert_callback(
-                xml_filename,
-                conllu_filename,
-                postag_filename,
-                sent_id_from_input=self.use_input_ids.get())
+            errors = self.convert_callback(xml_filename,
+                                           conllu_filename,
+                                           postag_filename,
+                                           sent_id_start=sent_id_start)
             if errors:
                 full_text = "\n".join(map(lambda x: x.msg, errors))
         except Exception as err:

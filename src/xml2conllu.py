@@ -49,7 +49,7 @@ class ConvertError(Exception):
         return self.msg
 
 
-def convert2conllu(xml_content, postag_data=None, sent_id_from_input=False):
+def convert2conllu(xml_content, postag_data=None, sent_id_start=1):
     """
     Converts the XML content to CoNLL-U using specified POS tags.
 
@@ -60,10 +60,9 @@ def convert2conllu(xml_content, postag_data=None, sent_id_from_input=False):
     postag_data: dict, optional
         The dictionary containing features of POS tags.
         Default is None.
-    sent_id_from_input: boolean, optional
-        Specifies whether sent_id attribute should be taken from
-        id attribute of sentence element or it should start at 1.
-        Default is False which means start at 1.
+    sent_id_start: integer, optional
+        Specifies the start value for sent_id attribute.
+        Default is 1.
 
     Returns
     -------
@@ -84,7 +83,7 @@ def convert2conllu(xml_content, postag_data=None, sent_id_from_input=False):
         return "", [err]
 
     conllu_output = ""
-    sentence_id = 1
+    sentence_id = sent_id_start if sent_id_start else 1
     validation_errors = []
     for xml_sentence in xml_root.findall('sentence'):
         citation_part = xml_sentence.attrib.get('citation-part')
@@ -146,9 +145,7 @@ def convert2conllu(xml_content, postag_data=None, sent_id_from_input=False):
             word_conllu_lines.append(word_conllu_line)
 
         # Print the sentence
-        sent_id = xml_sentence.attrib.get('id') if sent_id_from_input else str(
-            sentence_id)
-        conllu_output += '# sent_id = test-%s\n' % sent_id
+        conllu_output += '# sent_id = test-%s\n' % sentence_id
         conllu_output += '# text = %s\n' % sentence
         if citation_part:
             conllu_output += '# citation-part=%s\n' % citation_part
@@ -168,7 +165,7 @@ def split_with_positions(string):
     return results
 
 
-def convert(xml_file, conllu_file, postag_file, sent_id_from_input=False):
+def convert(xml_file, conllu_file, postag_file, sent_id_start=1):
     """
     Reads the content of input files and prerforms conversion.
 
@@ -180,11 +177,9 @@ def convert(xml_file, conllu_file, postag_file, sent_id_from_input=False):
         Path of the output CoNLL-U file.
     postag_file: string, required
         Path of input the POSTag file.
-    sent_id_from_input: boolean, optional
-        Specifies whether to populate attribute sent_id
-        with values from the id attribute of the sentence tag
-        from input XML file.
-        Default is False.
+    sent_id_start: integer, optional
+        Specifies the start value for sent_id attribute.
+        Default is 1.
     """
     postag_data = {}
     with open(postag_file, 'r') as fposttag:
@@ -202,10 +197,9 @@ def convert(xml_file, conllu_file, postag_file, sent_id_from_input=False):
     with open(xml_file, 'r', encoding='utf-8') as fxml:
         xml_content = fxml.read()
 
-        conllu_data, errors = convert2conllu(
-            xml_content,
-            postag_data=postag_data,
-            sent_id_from_input=sent_id_from_input)
+        conllu_data, errors = convert2conllu(xml_content,
+                                             postag_data=postag_data,
+                                             sent_id_start=sent_id_start)
 
         with open(conllu_file, 'w', encoding='utf-8') as fconllu:
             fconllu.write(conllu_data)
@@ -229,9 +223,10 @@ def parse_arguments():
                         help="Path of the input POSTag file.",
                         required=False)
     parser.add_argument(
-        '--use-input-sentence-id',
-        help="Use sentence id from input XML or to start at 1.",
-        action='store_true',
+        '--sent-id-start',
+        help="The start value for sent_id attribute. Default is 1.",
+        type=int,
+        default=1,
         required=False)
 
     return parser.parse_args()
@@ -243,7 +238,7 @@ if __name__ == '__main__':
         convert(args.xml_file,
                 args.conllu_file,
                 args.postag_file,
-                sent_id_from_input=args.use_input_sentence_id)
+                sent_id_start=args.sent_id_start)
     else:
         from application import Application
         from tkinter import Tk
