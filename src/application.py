@@ -1,6 +1,8 @@
 from tkinter import filedialog, Frame, Button, Entry, Label, END
 from tkinter import Toplevel
 from tkinter import Text
+from tkinter import Checkbutton
+from tkinter import IntVar
 
 
 class Application(Frame):
@@ -13,7 +15,7 @@ class Application(Frame):
         # ## XML Input ## #
         Label(master, text="Xml file").grid(row=0)
         self.xml_input = Entry(master)
-        self.xml_input.grid(row=0, column=1)
+        self.xml_input.grid(row=0, column=1, sticky='EW')
         Button(master,
                text='Browse',
                command=self.ask_open_xml_file) \
@@ -23,7 +25,7 @@ class Application(Frame):
         # ## Postag Input ## #
         Label(master, text="Postag file").grid(row=1)
         self.postag_input = Entry(master)
-        self.postag_input.grid(row=1, column=1)
+        self.postag_input.grid(row=1, column=1, sticky='EW')
         Button(master,
                text='Browse',
                command=self.ask_open_postag_file) \
@@ -33,17 +35,30 @@ class Application(Frame):
         # ## Conllu output ## #
         Label(master, text="Output conllu file").grid(row=2)
         self.conllu_output = Entry(master)
-        self.conllu_output.grid(row=2, column=1)
+        self.conllu_output.grid(row=2, column=1, sticky='EW')
         Button(master,
                text='Browse',
                command=self.ask_save_conllu_file) \
             .grid(row=2, column=2)
         # ## END ## #
 
+        # ## Input ids checkbox ## #
+        self.use_input_ids = IntVar()
+        self.use_input_ids_chk = Checkbutton(
+            master,
+            text="Use sentece ids from input file",
+            onvalue=1,
+            offvalue=0,
+            variable=self.use_input_ids)
+        self.use_input_ids_chk.grid(row=3, column=1)
+        # ## END ## #
+
+        # ## Convert button ## #
         self.convert_button = Button(master,
                                      text='Convert!',
                                      command=self.convert)
-        self.convert_button.grid(row=3, column=1)
+        self.convert_button.grid(row=4, column=1)
+        # ## END ## #
 
     def ask_open_postag_file(self):
         filename = filedialog.askopenfilename(initialdir="./",
