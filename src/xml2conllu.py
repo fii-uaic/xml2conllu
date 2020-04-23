@@ -49,7 +49,27 @@ class ConvertError(Exception):
         return self.msg
 
 
-def convert2conllu(xml_content, postag_data=None):
+def convert2conllu(xml_content, postag_data=None, sent_id_from_input=False):
+    """
+    Converts the XML content to CoNLL-U using specified POS tags.
+
+    Parameters
+    ----------
+    xml_content: string, required
+        The contents of the XML file given as input to the applicaiton.
+    postag_data: dict, optional
+        The dictionary containing features of POS tags.
+        Default is None.
+    sent_id_from_input: boolean, optional
+        Specifies whether sent_id attribute should be taken from
+        id attribute of sentence element or it should start at 1.
+        Default is False which means start at 1.
+
+    Returns
+    -------
+    (conllu_output, validation_errors)
+        Tuple containing the output and the validation errors.
+    """
     if postag_data is None:
         postag_data = {}
     xml_lines = xml_content.splitlines()
@@ -146,7 +166,24 @@ def split_with_positions(string):
     return results
 
 
-def convert(xml_file, conllu_file, postag_file):
+def convert(xml_file, conllu_file, postag_file, sent_id_from_input=False):
+    """
+    Reads the content of input files and prerforms conversion.
+
+    Parameters
+    ----------
+    xml_file: string, required
+        Path of the input XML file.
+    conllu_file: string, required
+        Path of the output CoNLL-U file.
+    postag_file: string, required
+        Path of input the POSTag file.
+    sent_id_from_input: boolean, optional
+        Specifies whether to populate attribute sent_id
+        with values from the id attribute of the sentence tag
+        from input XML file.
+        Default is False.
+    """
     postag_data = {}
     with open(postag_file, 'r') as fposttag:
         data_lines = fposttag.read().splitlines()
@@ -163,8 +200,10 @@ def convert(xml_file, conllu_file, postag_file):
     with open(xml_file, 'r', encoding='utf-8') as fxml:
         xml_content = fxml.read()
 
-        conllu_data, errors = convert2conllu(xml_content,
-                                             postag_data=postag_data)
+        conllu_data, errors = convert2conllu(
+            xml_content,
+            postag_data=postag_data,
+            sent_id_from_input=sent_id_from_input)
 
         with open(conllu_file, 'w', encoding='utf-8') as fconllu:
             fconllu.write(conllu_data)
@@ -187,6 +226,11 @@ def parse_arguments():
     parser.add_argument('--postag-file',
                         help="Path of the input POSTag file.",
                         required=False)
+    parser.add_argument(
+        '--use-input-sentece-id',
+        help="Use sentence id from input XML or to start at 1.",
+        action='store_true',
+        required=False)
 
     return parser.parse_args()
 
@@ -194,7 +238,10 @@ def parse_arguments():
 if __name__ == '__main__':
     args = parse_arguments()
     if args.no_window:
-        convert(args.xml_file, args.conllu_file, args.postag_file)
+        convert(args.xml_file,
+                args.conllu_file,
+                args.postag_file,
+                sent_id_from_input=args.use_input_sentence_id)
     else:
         from application import Application
         from tkinter import Tk
