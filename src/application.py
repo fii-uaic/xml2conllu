@@ -7,7 +7,9 @@ class Application(Frame):
     def __init__(self, convert_callback, master=None):
         Frame.__init__(self, master)
         self.convert_callback = convert_callback
+        self.create_widgets(master)
 
+    def create_widgets(self, master):
         # ## XML Input ## #
         Label(master, text="Xml file").grid(row=0)
         self.xml_input = Entry(master)
