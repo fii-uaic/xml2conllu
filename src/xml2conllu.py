@@ -229,7 +229,7 @@ def parse_arguments():
                         help="Path of the input POSTag file.",
                         required=False)
     parser.add_argument(
-        '--use-input-sentece-id',
+        '--use-input-sentence-id',
         help="Use sentence id from input XML or to start at 1.",
         action='store_true',
         required=False)
