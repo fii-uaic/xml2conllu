@@ -84,7 +84,9 @@ class Application(Frame):
         xml_filename = self.xml_input.get()
         postag_filename = self.postag_input.get()
         conllu_filename = self.conllu_output.get()
-
+        is_valid, sent_id_start = self.get_sent_id_input()
+        if not is_valid:
+            return
         full_text = "Success!"
         try:
             errors = self.convert_callback(
@@ -97,14 +99,36 @@ class Application(Frame):
         except Exception as err:
             full_text = "\n".join(["Fatal error!", str(err)])
 
+        self.display_message(full_text)
+
+    def display_message(self, message, title="Conversion output"):
         status_window = Toplevel(self)
-        status_window.wm_title("Convert output!")
+        status_window.wm_title(title)
 
         text = Text(status_window, width=100, height=20)
-        text.insert(END, full_text)
+        text.insert(END, message)
         text.pack()
 
         quit = Button(status_window,
                       text="Close",
                       command=status_window.destroy)
         quit.pack()
+
+    def get_sent_id_input(self):
+        """
+        Validates the input of start_id and returns it.
+
+        Returns
+        -------
+        (is_valid, sent_id_start)
+            A tuple specifying whether input is valid and its value.
+            If input is invalid the return wil bee (False, None);
+            otherwise (True, sent_id_start) will be returned.
+        """
+        try:
+            sent_id_start = int(self.start_id_input.get())
+            return True, sent_id_start
+        except Exception:
+            self.display_message('Please specify a valid integer value.',
+                                 title="Validation error.")
+            return False, None
