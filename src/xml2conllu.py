@@ -250,4 +250,3 @@ if __name__ == '__main__':
         root = Tk()
         app = Application(convert, master=root)
         app.mainloop()
-        root.destroy()
