@@ -1,6 +1,8 @@
 from tkinter import filedialog, Frame, Button, Entry, Label, END
 from tkinter import Toplevel
 from tkinter import Text
+from tkinter import Radiobutton
+from tkinter import StringVar
 
 
 class Application(Frame):
@@ -8,6 +10,7 @@ class Application(Frame):
         Frame.__init__(self, master)
         self.convert_callback = convert_callback
         self.create_widgets(master)
+        self.set_default_values()
 
     def create_widgets(self, master):
         # ## XML Input ## #
@@ -40,19 +43,41 @@ class Application(Frame):
             .grid(row=2, column=2)
         # ## END ## #
 
-        # ## Input ids checkbox ## #
+        # ## Start sent_id widgets ## #
         Label(master, text="Start sent_id at:").grid(row=3, column=0)
         self.start_id_input = Entry(master)
         self.start_id_input.grid(row=3, column=1)
-        self.start_id_input.insert(0, "1")
+        # ## END ## #
+
+        # ## Sentence type widgets ## #
+        Label(master, text="Sentence type:").grid(row=4, column=0)
+        self.sentence_type = StringVar()
+        self.train_rb = Radiobutton(master,
+                                    text="Train",
+                                    variable=self.sentence_type,
+                                    value='train')
+        self.train_rb.grid(row=4, column=1, sticky='W')
+        self.test_rb = Radiobutton(master,
+                                   text="Test",
+                                   variable=self.sentence_type,
+                                   value='test')
+        self.test_rb.grid(row=5, column=1, sticky='W')
+
         # ## END ## #
 
         # ## Convert button ## #
         self.convert_button = Button(master,
                                      text='Convert!',
                                      command=self.convert)
-        self.convert_button.grid(row=4, column=1)
+        self.convert_button.grid(row=6, column=1)
         # ## END ## #
+
+    def set_default_values(self):
+        """
+        Sets default values for input widgets.
+        """
+        self.start_id_input.insert(0, '1')
+        self.train_rb.select()
 
     def ask_open_postag_file(self):
         filename = filedialog.askopenfilename(initialdir="./",
@@ -89,10 +114,12 @@ class Application(Frame):
             return
         full_text = "Success!"
         try:
-            errors = self.convert_callback(xml_filename,
-                                           conllu_filename,
-                                           postag_filename,
-                                           sent_id_start=sent_id_start)
+            errors = self.convert_callback(
+                xml_filename,
+                conllu_filename,
+                postag_filename,
+                sent_id_start=sent_id_start,
+                sentence_type=self.sentence_type.get())
             if errors:
                 full_text = "\n".join(map(lambda x: x.msg, errors))
         except Exception as err:
