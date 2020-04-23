@@ -146,7 +146,9 @@ def convert2conllu(xml_content, postag_data=None, sent_id_from_input=False):
             word_conllu_lines.append(word_conllu_line)
 
         # Print the sentence
-        conllu_output += '# sent_id = test-%s\n' % sentence_id
+        sent_id = xml_sentence.attrib.get('id') if sent_id_from_input else str(
+            sentence_id)
+        conllu_output += '# sent_id = test-%s\n' % sent_id
         conllu_output += '# text = %s\n' % sentence
         if citation_part:
             conllu_output += '# citation-part=%s\n' % citation_part
