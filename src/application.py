@@ -1,8 +1,6 @@
 from tkinter import filedialog, Frame, Button, Entry, Label, END
 from tkinter import Toplevel
 from tkinter import Text
-from tkinter import Checkbutton
-from tkinter import IntVar
 
 
 class Application(Frame):
@@ -43,14 +41,10 @@ class Application(Frame):
         # ## END ## #
 
         # ## Input ids checkbox ## #
-        self.use_input_ids = IntVar()
-        self.use_input_ids_chk = Checkbutton(
-            master,
-            text="Use sentece ids from input file",
-            onvalue=1,
-            offvalue=0,
-            variable=self.use_input_ids)
-        self.use_input_ids_chk.grid(row=3, column=1)
+        Label(master, text="Start sent_id at:").grid(row=3, column=0)
+        self.start_id_input = Entry(master)
+        self.start_id_input.grid(row=3, column=1)
+        self.start_id_input.insert(0, "1")
         # ## END ## #
 
         # ## Convert button ## #
