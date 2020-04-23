@@ -172,7 +172,11 @@ def split_with_positions(string):
     return results
 
 
-def convert(xml_file, conllu_file, postag_file, sent_id_start=1):
+def convert(xml_file,
+            conllu_file,
+            postag_file,
+            sent_id_start=1,
+            sentence_type='train'):
     """
     Reads the content of input files and prerforms conversion.
 
@@ -187,6 +191,9 @@ def convert(xml_file, conllu_file, postag_file, sent_id_start=1):
     sent_id_start: integer, optional
         Specifies the start value for sent_id attribute.
         Default is 1.
+    sentence_type: string, optional
+        Specifies the type of sentences. Values are 'train' and 'test'.
+        Default is 'train'.
     """
     postag_data = {}
     with open(postag_file, 'r') as fposttag:
@@ -206,7 +213,8 @@ def convert(xml_file, conllu_file, postag_file, sent_id_start=1):
 
         conllu_data, errors = convert2conllu(xml_content,
                                              postag_data=postag_data,
-                                             sent_id_start=sent_id_start)
+                                             sent_id_start=sent_id_start,
+                                             sentence_type=sentence_type)
 
         with open(conllu_file, 'w', encoding='utf-8') as fconllu:
             fconllu.write(conllu_data)
@@ -235,6 +243,10 @@ def parse_arguments():
         type=int,
         default=1,
         required=False)
+    parser.add_argument('--sentence-type',
+                        help="Specifies the type of the sentece to output.",
+                        choices=['train', 'test'],
+                        default='train')
 
     return parser.parse_args()
 
@@ -245,7 +257,8 @@ if __name__ == '__main__':
         convert(args.xml_file,
                 args.conllu_file,
                 args.postag_file,
-                sent_id_start=args.sent_id_start)
+                sent_id_start=args.sent_id_start,
+                sentence_type=args.sentence_type)
     else:
         from application import Application
         from tkinter import Tk

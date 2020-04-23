@@ -20,7 +20,7 @@ pyinstaller -n xml2conllu.exe -F .\xml2conllu.py
 The application can be executed from command-line without GUI. To do so, use the following command:
 
 ``` shell
-xml2conllu.exe --no-window --xml-file <xml-file-path> --postag-file <postag-file-path> --conllu-file <conllu-file-path> [--sent-id-start <integer-value>]
+xml2conllu.exe --no-window --xml-file <xml-file-path> --postag-file <postag-file-path> --conllu-file <conllu-file-path> [--sent-id-start <integer-value>] [--sentence-type train|test]
 ```
 
 To see what each parameter is doing, type:
