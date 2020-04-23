@@ -49,7 +49,10 @@ class ConvertError(Exception):
         return self.msg
 
 
-def convert2conllu(xml_content, postag_data=None, sent_id_start=1):
+def convert2conllu(xml_content,
+                   postag_data=None,
+                   sent_id_start=1,
+                   sentence_type='train'):
     """
     Converts the XML content to CoNLL-U using specified POS tags.
 
@@ -63,6 +66,9 @@ def convert2conllu(xml_content, postag_data=None, sent_id_start=1):
     sent_id_start: integer, optional
         Specifies the start value for sent_id attribute.
         Default is 1.
+    sentence_type: string, optional
+        Specifies the type of sentences. Values are 'train' and 'test'.
+        Default is 'train'.
 
     Returns
     -------
@@ -145,10 +151,11 @@ def convert2conllu(xml_content, postag_data=None, sent_id_start=1):
             word_conllu_lines.append(word_conllu_line)
 
         # Print the sentence
-        conllu_output += '# sent_id = test-%s\n' % sentence_id
-        conllu_output += '# text = %s\n' % sentence
+        conllu_output += '# sent_id = {}-{}\n'.format(sentence_type,
+                                                      sentence_id)
+        conllu_output += '# text = {}\n'.format(sentence)
         if citation_part:
-            conllu_output += '# citation-part=%s\n' % citation_part
+            conllu_output += '# citation-part={}\n'.format(citation_part)
         conllu_output += "\n".join(word_conllu_lines)
         conllu_output += '\n\n'
 
